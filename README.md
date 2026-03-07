@@ -1,33 +1,130 @@
-# Bybit MCP Server
+<div align="center">
+
+# 🟡 Bybit MCP Server
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
-[![MCP](https://img.shields.io/badge/MCP-compatible-green.svg)](https://modelcontextprotocol.io)
+[![MCP](https://img.shields.io/badge/MCP-compatible-purple.svg)](https://modelcontextprotocol.io)
+[![Tools](https://img.shields.io/badge/Tools-246-orange.svg)](#-available-tools-246)
+[![Bybit V5 API](https://img.shields.io/badge/Bybit-V5%20API-green.svg)](https://bybit-exchange.github.io/docs/v5/intro)
 
-基于 MCP (Model Context Protocol) 的 Bybit V5 交易接口服务器。通过 MCP 协议让 AI 助手（如 Cursor、Claude Desktop 等）直接与 Bybit 交易所交互，实现智能交易和市场分析。
+**The most comprehensive MCP server for Bybit — 246 tools covering the entire Bybit V5 API**
 
-## 功能特性
+[Quick Start](#-quick-start) •
+[Features](#-features) •
+[Configuration](#%EF%B8%8F-configuration) •
+[Tools Reference](#-available-tools-246) •
+[Contributing](#-contributing)
 
-- 246 个工具，全量覆盖 Bybit V5 API（行情、交易、账户、持仓、资产、借贷、理财、杠杆代币、现货杠杆、用户管理、经纪商、OTC、Spread、RFQ 等）
-- 支持 STDIO、SSE、Streamable HTTP 三种传输模式
-- 支持 `.env` 文件配置，也支持命令行参数
-- 无密钥只读模式：无需 API key 即可使用所有行情工具
-- 结构化日志 (`--log-level DEBUG/INFO/WARNING/ERROR`)
-- 模块化架构，易于扩展
+</div>
 
-## 安装
+---
+
+## 🎯 Overview
+
+Bybit MCP Server enables AI assistants like **Claude**, **Cursor**, **ChatGPT**, and other MCP-compatible clients to interact directly with the Bybit cryptocurrency exchange. Execute trades, manage portfolios, analyze markets, and automate strategies — all through natural language.
+
+### Why Bybit MCP?
+
+- **🔥 Complete Coverage** — 246 tools spanning every Bybit V5 API endpoint
+- **🔐 Secure by Design** — API credentials never leave your machine
+- **👁️ Read-Only Mode** — Use all market tools without any API key
+- **📡 Triple Transport** — STDIO, SSE, and Streamable HTTP
+- **🔌 Universal Compatibility** — Works with Claude Desktop, Cursor, ChatGPT, and any MCP client
+- **⚡ Zero Config Start** — Just `uv run bybit.py` and go
+
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 📈 Trading & Markets
+- **Spot Trading** — Market & limit orders, batch operations
+- **Derivatives** — Linear & inverse perpetuals
+- **Order Management** — Amend, cancel, batch, DCP
+- **Market Data** — Klines, orderbook, tickers, funding rates
+- **Open Interest** — Long/short ratio, ADL alerts
+
+</td>
+<td width="50%">
+
+### 💰 Earn & Lending
+- **Simple Earn** — Stake, redeem, yield tracking
+- **Crypto Loans** — Old & new (fixed + flexible)
+- **Leveraged Tokens** — Subscribe & redeem
+- **Spot Margin** — Cross-margin trading
+- **OTC Lending** — Institutional loan management
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 🏦 Account & Assets
+- **Wallet** — Deposits, withdrawals, transfers
+- **Multi-Account** — Sub-accounts, universal transfers
+- **Asset Convert** — Crypto-to-crypto, small balance, fiat
+- **Margin Modes** — Cross, isolated, portfolio margin
+- **Risk Management** — MMP, leverage, TP/SL
+
+</td>
+<td width="50%">
+
+### 🛠️ Advanced
+- **Spread Trading** — Spread instruments & orders
+- **Block Trading (RFQ)** — Request for quote workflow
+- **Broker** — Earnings, rate limits, vouchers
+- **Strategy** — Built-in arbitrage detection
+- **Announcements** — Exchange news & system status
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python ≥ 3.13
+- [uv](https://docs.astral.sh/uv/) package manager
+- Bybit account with API credentials *(optional — market data works without)*
+
+### Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/JohnnyWic/bybit-mcp.git
 cd bybit-mcp
+
+# Install dependencies
 uv sync
 ```
 
-## 配置
+### Run
 
-### 方式一：.env 文件（推荐）
+```bash
+# Start in STDIO mode (default)
+uv run bybit.py
 
-复制示例文件并填入你的 API 密钥：
+# Start in SSE mode
+uv run bybit.py --transport sse --port 8000
+
+# Start in Streamable HTTP mode
+uv run bybit.py --transport streamable-http --port 8000
+```
+
+> 💡 **No API key?** No problem! All 23 market tools work without authentication.
+
+---
+
+## ⚙️ Configuration
+
+### Environment Variables (Recommended)
 
 ```bash
 cp .env.example .env
@@ -39,63 +136,31 @@ BYBIT_SECRET_KEY=your_secret_key_here
 BYBIT_TESTNET=false
 ```
 
-### 方式二：命令行参数
+> **🔒 Security Note:** Never commit your `.env` file. It's already in `.gitignore`.
+
+### Command Line Arguments
 
 ```bash
 uv run bybit.py --bybit-api-key YOUR_KEY --bybit-secret-key YOUR_SECRET
 ```
 
-### 方式三：无密钥只读模式
+### Keyless Read-Only Mode
 
-不配置任何密钥即可启动，行情类工具（价格、K线、订单簿等）正常可用。调用需要认证的工具时会返回清晰的错误提示。
+Simply start without any credentials. All market data tools (prices, klines, orderbook, funding rates, etc.) work normally. Authenticated endpoints return a clear error message.
 
-## 启动
-
-### STDIO 模式（默认，用于 MCP 客户端集成）
+### Structured Logging
 
 ```bash
-uv run bybit.py
+uv run bybit.py --log-level DEBUG    # DEBUG / INFO / WARNING / ERROR
 ```
 
-### SSE 模式
+---
 
-```bash
-uv run bybit.py --transport sse --host 127.0.0.1 --port 8000
-```
+## 🖥️ Client Configuration
 
-### Streamable HTTP 模式
+### Claude Desktop / Cursor (STDIO)
 
-```bash
-uv run bybit.py --transport streamable-http --host 127.0.0.1 --port 8000
-```
-
-## MCP 客户端配置
-
-### STDIO 模式
-
-在你的 MCP 配置文件中（如 `~/.cursor/mcp.json`）添加：
-
-```json
-{
-  "mcpServers": {
-    "bybit-mcp": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/path/to/bybit-mcp",
-        "run",
-        "bybit.py",
-        "--bybit-api-key",
-        "YOUR_API_KEY",
-        "--bybit-secret-key",
-        "YOUR_SECRET_KEY"
-      ]
-    }
-  }
-}
-```
-
-如使用 `.env` 文件配置密钥，可简化为：
+Add to your MCP config file (e.g., `~/.cursor/mcp.json`):
 
 ```json
 {
@@ -108,9 +173,27 @@ uv run bybit.py --transport streamable-http --host 127.0.0.1 --port 8000
 }
 ```
 
-### SSE 模式
+With inline credentials:
 
-先启动服务器，然后配置客户端连接：
+```json
+{
+  "mcpServers": {
+    "bybit-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory", "/path/to/bybit-mcp", "run", "bybit.py",
+        "--bybit-api-key", "YOUR_API_KEY",
+        "--bybit-secret-key", "YOUR_SECRET_KEY"
+      ]
+    }
+  }
+}
+```
+
+### ChatGPT / Web Apps (SSE)
+
+1. Start the server: `uv run bybit.py --transport sse --port 8000`
+2. Configure client:
 
 ```json
 {
@@ -122,37 +205,167 @@ uv run bybit.py --transport streamable-http --host 127.0.0.1 --port 8000
 }
 ```
 
-## 可用工具（246 个）
+---
 
-| 模块 | 工具数 | 说明 |
-|------|--------|------|
-| **Market** (行情) | 23 | 价格、K线、订单簿、资金费率、持仓量等（无需 API key） |
-| **Trade** (交易) | 15 | 下单、撤单、改单、批量操作、订单历史 |
-| **Account** (账户) | 25 | 余额、手续费、保证金模式、借贷、MMP |
-| **Position** (持仓) | 11 | 持仓查询、杠杆、止盈止损、移仓 |
-| **Asset** (资产) | 41 | 充提币、划转、兑换、法币、地址管理 |
-| **Pre-Upgrade** | 6 | 升级前历史数据查询 |
-| **Lending** (借贷) | 39 | 加密借贷（旧版+新版固定/灵活） |
-| **Earn** (理财) | 6 | 质押、赎回、收益查询 |
-| **Leveraged Token** | 5 | 杠杆代币申购/赎回 |
-| **Spot Margin** | 12 | 现货杠杆交易管理 |
-| **User** (用户) | 15 | 子账户、API Key 管理 |
-| **Broker** (经纪商) | 10 | 经纪商收益、限速、代金券 |
-| **OTC** | 7 | 机构借贷 |
-| **Spread** | 11 | 价差交易 |
-| **RFQ** | 15 | 大宗交易询价 |
-| **Announcement** | 2 | 公告、系统状态 |
-| **Strategy** (策略) | 2 | 套利策略 |
+## 💬 Usage Examples
 
-完整工具列表请运行 `uv run python -c "import src.tools; from src import mcp; [print(n) for n in sorted(mcp._tool_manager._tools)]"` 查看。
+### Check Market Price
 
-## 安全提示
+```
+"What's the current price of BTC?"
+```
 
-- 妥善保管 API 密钥，勿提交 `.env` 文件到版本控制
-- 建议设置 API 权限限制（如仅允许交易，禁止提币）
-- 建议先在测试网 (`--testnet`) 上进行测试
-- 套利策略存在风险，请谨慎使用
+### Place a Trade
 
-## 许可证
+```
+"Buy 0.01 BTC at market price on spot"
+```
 
-[MIT](LICENSE)
+### Analyze Funding Rates
+
+```
+"Show me the funding rate history for ETHUSDT over the last 24 hours"
+```
+
+### Manage Positions
+
+```
+"What are my open positions? Set a stop loss at 95000 for my BTCUSDT long"
+```
+
+### Portfolio Overview
+
+```
+"Show my unified account balance and all open orders"
+```
+
+---
+
+## 📊 Available Tools (246)
+
+| Module | Tools | Description |
+|--------|------:|-------------|
+| **Market** | 23 | Prices, klines, orderbook, funding rates, open interest, tickers *(no API key needed)* |
+| **Trade** | 15 | Market/limit orders, amend, cancel, batch operations, DCP |
+| **Account** | 25 | Balance, fee rates, margin mode, collateral, MMP, transaction log |
+| **Position** | 11 | Positions, leverage, TP/SL, auto-margin, move positions |
+| **Asset** | 41 | Deposits, withdrawals, transfers, convert, fiat, address management |
+| **Lending** | 39 | Crypto loans — legacy + new (fixed & flexible) |
+| **User** | 15 | Sub-accounts, API key management, affiliate |
+| **RFQ** | 15 | Block trading — create/cancel RFQ, quotes, executions |
+| **Spot Margin** | 12 | Spot margin trading, borrow, repay, collateral |
+| **Spread** | 11 | Spread instruments, orderbook, trading |
+| **Broker** | 10 | Broker earnings, rate limits, vouchers |
+| **OTC** | 7 | Institutional OTC lending |
+| **Pre-Upgrade** | 6 | Pre-upgrade historical data queries |
+| **Earn** | 6 | Staking, redemption, yield tracking |
+| **Leveraged Token** | 5 | Leveraged token subscribe/redeem |
+| **Announcement** | 2 | Exchange announcements, system status |
+| **Strategy** | 2 | Built-in arbitrage pair detection |
+
+**Total: 246 tools**
+
+<details>
+<summary><b>📋 View all tool names</b></summary>
+
+```bash
+uv run python -c "
+import src.tools
+from src import mcp
+for name in sorted(mcp._tool_manager._tools):
+    print(name)
+"
+```
+
+</details>
+
+---
+
+## 🏗️ Project Structure
+
+```
+bybit-mcp/
+├── bybit.py                    # Entry point (backward compatible)
+├── src/
+│   ├── __init__.py             # Shared FastMCP instance
+│   ├── main.py                 # CLI: dotenv + argparse + logging + mcp.run()
+│   ├── client.py               # Config singleton + HMAC signing + HTTP methods
+│   └── tools/
+│       ├── __init__.py         # Auto-imports all tool modules
+│       ├── market.py           # 23 tools — public market data
+│       ├── trade.py            # 15 tools — order management
+│       ├── account.py          # 25 tools — account operations
+│       ├── position.py         # 11 tools — position management
+│       ├── asset.py            # 41 tools — wallet & transfers
+│       ├── lending.py          # 39 tools — crypto loans
+│       ├── earn.py             #  6 tools — staking & yield
+│       ├── leveraged_token.py  #  5 tools — leveraged tokens
+│       ├── spot_margin.py      # 12 tools — spot margin
+│       ├── user.py             # 15 tools — sub-accounts & API keys
+│       ├── broker.py           # 10 tools — broker services
+│       ├── otc.py              #  7 tools — OTC lending
+│       ├── spread.py           # 11 tools — spread trading
+│       ├── rfq.py              # 15 tools — block trading RFQ
+│       ├── pre_upgrade.py      #  6 tools — pre-upgrade data
+│       ├── announcement.py     #  2 tools — announcements
+│       └── strategy.py         #  2 tools — arbitrage strategies
+├── .env.example                # Environment variable template
+├── pyproject.toml              # Project config & dependencies
+└── LICENSE                     # MIT License
+```
+
+---
+
+## ⚠️ Disclaimer
+
+This software is provided for educational and informational purposes only.
+
+- **Not Financial Advice** — This tool does not provide financial, investment, or trading advice
+- **Use at Your Own Risk** — Cryptocurrency trading involves substantial risk of loss
+- **API Security** — Protect your API credentials; use IP restrictions and disable withdrawal permissions
+- **Test First** — Always test on [Bybit Testnet](https://testnet.bybit.com/) before using real funds (`--testnet` flag)
+- **No Warranty** — The software is provided "as is" without warranty of any kind
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Adding New Tools
+
+1. Add your tool function in the appropriate `src/tools/*.py` module
+2. Decorate with `@mcp.tool()`
+3. Use `_public_get` for unauthenticated or `_signed_get`/`_signed_post` for authenticated endpoints
+4. That's it — tools are auto-registered on import
+
+---
+
+## 📚 Resources
+
+| Resource | Description |
+|----------|-------------|
+| [Bybit V5 API Docs](https://bybit-exchange.github.io/docs/v5/intro) | Official Bybit API documentation |
+| [Bybit Testnet](https://testnet.bybit.com/) | Practice trading with test funds |
+| [MCP Specification](https://modelcontextprotocol.io/) | Model Context Protocol spec |
+| [uv Package Manager](https://docs.astral.sh/uv/) | Fast Python package manager |
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**Built with ❤️ for the Bybit trading community**
+
+</div>
