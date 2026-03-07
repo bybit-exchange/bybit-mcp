@@ -65,7 +65,7 @@ def get_spot_margin_position_tiers(currency: str = "") -> Any:
     params: dict[str, str] = {}
     if currency:
         params["currency"] = currency
-    return _public_get("/v5/spot-margin-trade/position-tiers", params)
+    return _signed_get("/v5/spot-margin-trade/position-tiers", params)
 
 
 @mcp.tool()

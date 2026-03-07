@@ -1,7 +1,7 @@
 from typing import Any
 
 from src import mcp
-from src.client import _signed_get, _signed_post, _public_get
+from src.client import _signed_get, _signed_post
 
 
 @mcp.tool()
@@ -124,7 +124,7 @@ def get_rfq_public_trades(limit: int = 50) -> Any:
     Args:
         limit: Number of records (default: 50).
     """
-    return _public_get("/v5/rfq/public-trades", {"limit": str(limit)})
+    return _signed_get("/v5/rfq/public-trades", {"limit": str(limit)})
 
 
 @mcp.tool()
