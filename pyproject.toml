@@ -1,10 +1,15 @@
 [project]
 name = "bybit-mcp-server"
-version = "0.1.0"
+version = "0.2.0"
 description = "Bybit MCP Server - AI-powered cryptocurrency trading via Model Context Protocol"
 readme = "README.md"
 requires-python = ">=3.13"
+license = "MIT"
 dependencies = [
     "mcp[cli]>=1.6.0",
+    "python-dotenv>=1.0.0",
     "requests>=2.32.3",
 ]
+
+[project.scripts]
+bybit-mcp = "src.main:main"
