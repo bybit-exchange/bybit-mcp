@@ -27,7 +27,7 @@ Bybit MCP Server enables AI assistants like **Claude**, **Cursor**, **ChatGPT**,
 
 ### Why Bybit MCP?
 
-- **🔥 Complete Coverage** — 246 tools spanning every Bybit V5 API endpoint
+- **🔥 Complete Coverage** — 247 tools spanning every Bybit V5 API endpoint
 - **🔐 Secure by Design** — API credentials never leave your machine
 - **👁️ Read-Only Mode** — Use all market tools without any API key
 - **📡 Triple Transport** — STDIO, SSE, and Streamable HTTP
