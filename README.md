@@ -8,7 +8,7 @@
 [![Tools](https://img.shields.io/badge/Tools-246-orange.svg)](#-available-tools-246)
 [![Bybit V5 API](https://img.shields.io/badge/Bybit-V5%20API-green.svg)](https://bybit-exchange.github.io/docs/v5/intro)
 
-**The most comprehensive MCP server for Bybit — 246 tools covering the entire Bybit V5 API**
+**The most comprehensive MCP server for Bybit — 247 tools covering the entire Bybit V5 API**
 
 [Quick Start](#-quick-start) •
 [Features](#-features) •
