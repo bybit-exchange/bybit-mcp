@@ -14,6 +14,7 @@
 [Features](#-features) •
 [Configuration](#%EF%B8%8F-configuration) •
 [Tools Reference](#-available-tools-246) •
+[Troubleshooting](#-troubleshooting) •
 [Contributing](#-contributing)
 
 </div>
@@ -88,79 +89,37 @@ Bybit MCP Server enables AI assistants like **Claude**, **Cursor**, **ChatGPT**,
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Method 1: Ask AI to Install (Recommended)
 
-- Python ≥ 3.13
-- [uv](https://docs.astral.sh/uv/) package manager
-- Bybit account with API credentials *(optional — market data works without)*
+Simply tell your AI assistant:
 
-### Installation
+> **"Help me install the Bybit MCP server from https://github.com/JohnnyWic/bybit-mcp"**
+
+Your AI will clone the repo, install dependencies, and configure everything automatically. Works with Claude Code, Cursor, and other MCP-compatible clients.
+
+### Method 2: Manual Setup
+
+#### 1. Install
 
 ```bash
-# Clone the repository
 git clone https://github.com/JohnnyWic/bybit-mcp.git
 cd bybit-mcp
-
-# Install dependencies
 uv sync
 ```
 
-### Run
+> Requires [Python ≥ 3.13](https://www.python.org/downloads/) and [uv](https://docs.astral.sh/uv/).
 
-```bash
-# Start in STDIO mode (default)
-uv run bybit.py
+#### 2. Add to Your MCP Client
 
-# Start in SSE mode
-uv run bybit.py --transport sse --port 8000
+Add the following to your MCP config file:
 
-# Start in Streamable HTTP mode
-uv run bybit.py --transport streamable-http --port 8000
-```
+| Client | Config File |
+|--------|------------|
+| Claude Desktop | `claude_desktop_config.json` |
+| Cursor | `~/.cursor/mcp.json` |
+| Claude Code | Run `claude mcp add` (see below) |
 
-> 💡 **No API key?** No problem! All 23 market tools work without authentication.
-
----
-
-## ⚙️ Configuration
-
-### Environment Variables (Recommended)
-
-```bash
-cp .env.example .env
-```
-
-```env
-BYBIT_API_KEY=your_api_key_here
-BYBIT_SECRET_KEY=your_secret_key_here
-BYBIT_TESTNET=false
-```
-
-> **🔒 Security Note:** Never commit your `.env` file. It's already in `.gitignore`.
-
-### Command Line Arguments
-
-```bash
-uv run bybit.py --bybit-api-key YOUR_KEY --bybit-secret-key YOUR_SECRET
-```
-
-### Keyless Read-Only Mode
-
-Simply start without any credentials. All market data tools (prices, klines, orderbook, funding rates, etc.) work normally. Authenticated endpoints return a clear error message.
-
-### Structured Logging
-
-```bash
-uv run bybit.py --log-level DEBUG    # DEBUG / INFO / WARNING / ERROR
-```
-
----
-
-## 🖥️ Client Configuration
-
-### Claude Desktop / Cursor (STDIO)
-
-Add to your MCP config file (e.g., `~/.cursor/mcp.json`):
+**JSON config (Claude Desktop / Cursor):**
 
 ```json
 {
@@ -173,7 +132,27 @@ Add to your MCP config file (e.g., `~/.cursor/mcp.json`):
 }
 ```
 
-With inline credentials:
+**Claude Code CLI:**
+
+```bash
+claude mcp add bybit-mcp -- uv --directory /path/to/bybit-mcp run bybit.py
+```
+
+#### 3. Configure API Key (Optional)
+
+Create a `.env` file in the project root:
+
+```bash
+cp .env.example .env
+```
+
+```env
+BYBIT_API_KEY=your_api_key_here
+BYBIT_SECRET_KEY=your_secret_key_here
+BYBIT_TESTNET=false
+```
+
+Or pass credentials inline in the MCP config:
 
 ```json
 {
@@ -190,19 +169,16 @@ With inline credentials:
 }
 ```
 
-### ChatGPT / Web Apps (SSE)
+> 💡 **No API key?** No problem! All 23 market data tools work without authentication.
+>
+> **🔒 Security Note:** Never commit your `.env` file. It's already in `.gitignore`.
 
-1. Start the server: `uv run bybit.py --transport sse --port 8000`
-2. Configure client:
+### Transport Modes
 
-```json
-{
-  "mcpServers": {
-    "bybit-mcp": {
-      "url": "http://127.0.0.1:8000/sse"
-    }
-  }
-}
+```bash
+uv run bybit.py                                        # STDIO (default)
+uv run bybit.py --transport sse --port 8000             # SSE
+uv run bybit.py --transport streamable-http --port 8000 # Streamable HTTP
 ```
 
 ---
@@ -313,6 +289,69 @@ bybit-mcp/
 ├── pyproject.toml              # Project config & dependencies
 └── LICENSE                     # MIT License
 ```
+
+---
+
+## 🔧 Troubleshooting
+
+### MCP Server Not Loading / "No MCP servers configured"
+
+If you've configured the server but `/mcp` shows no tools or "No MCP servers configured":
+
+#### 1. Check the correct configuration file
+
+Claude Code reads MCP server config from `~/.claude.json` (per-project), **not** from `~/.claude/settings.json`. The recommended way to add the server is via CLI:
+
+```bash
+claude mcp add bybit-mcp -- uv --directory /path/to/bybit-mcp run bybit.py
+```
+
+This writes the config to the correct location. If you manually edited `~/.claude/settings.json`, the server won't be found.
+
+#### 2. Use the full path to `uv`
+
+Claude Code spawns MCP server subprocesses **without loading your shell profile** (`.zshrc` / `.zprofile`), so `PATH` may not include `~/.local/bin`. Use the absolute path:
+
+```bash
+# Find your uv path
+which uv
+# Example output: /Users/yourname/.local/bin/uv
+
+# Add with full path
+claude mcp add bybit-mcp -- /Users/yourname/.local/bin/uv --directory /path/to/bybit-mcp run bybit.py
+```
+
+#### 3. Restart Claude Code after configuration changes
+
+MCP servers connect at session startup. After adding or changing config, you must **exit and restart** Claude Code for changes to take effect.
+
+#### 4. Verify the server starts correctly
+
+Test that the server can start and respond to MCP protocol:
+
+```bash
+# Test import
+uv run python -c "from src.main import main; print('Import OK')"
+
+# Test MCP initialize handshake
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"0.1"}}}' | uv run bybit.py
+```
+
+If the import fails, run `uv sync` to install dependencies.
+
+#### 5. Don't run the server manually
+
+Claude Code manages the MCP server process itself via stdio. A manually started server instance is **completely separate** — Claude Code won't connect to it. Let Claude Code handle the lifecycle automatically.
+
+### Quick Diagnosis Checklist
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `/mcp` shows "No MCP servers configured" | Config in wrong file (`settings.json` instead of `.claude.json`) | Use `claude mcp add` CLI command |
+| Config exists but tools don't load | `uv` not found (PATH issue) | Use absolute path to `uv` |
+| Tools loaded before but not now | Session not restarted after config change | Restart Claude Code |
+| Server works manually but not in Claude Code | Manual server is a separate process | Don't start manually; let Claude Code manage it |
+| Import errors on startup | Dependencies not installed | Run `uv sync` |
 
 ---
 
